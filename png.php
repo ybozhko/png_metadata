@@ -5,10 +5,9 @@ $file = 'test.png';
 $png = new PNG_MetaDataHandler($file);
 
 if ($png->check_chunks("iTXt", "openbadge"))
-     $png->write_chunks("iTXt", "openbadge", 'http://community.totaralms.com/testbadge.php');
+     $png->write_chunks("iTXt", "openbadge", 'http://192.168.2.111//testbadge.php');
 
 $png->print_chunks('iTXt');
-
 
 class PNG_MetaDataHandler
 {
@@ -129,6 +128,9 @@ class PNG_MetaDataHandler
         }
     }
 
+    /**
+     * Prints chunks of a specific type.
+     */
     public function print_chunks($type) {
         if (array_key_exists($type, $this->_chunks)) {
             var_dump($this->_chunks[$type]);
