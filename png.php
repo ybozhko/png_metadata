@@ -4,8 +4,32 @@ $file = 'test.png';
 
 $png = new PNG_MetaDataHandler($file);
 
-if ($png->check_chunks("iTXt", "openbadge"))
-     $png->write_chunks("iTXt", "openbadge", 'http://192.168.2.111//testbadge.php');
+$assertion = '{
+   "recipient":"XXX@gmail.com",
+   "evidence":"/whatever.html",
+   "expires":"2040-08-13",
+   "issued_on":"2011-08-23",
+   "badge":{
+      "version":"v0.5.0",
+      "name":"Badge 1427691567831-1",
+      "description":"For rocking in the free world",
+      "image":"http://vanillicon.com/cbeb7a6a9fecb4b9eca6f389b6b1fdd9.png",
+      "criteria":"/criteria.html",
+      "issuer":{
+         "origin":"http://badgetest.herokuapp.com",
+         "name":"yep",
+         "contact":"admin@sup.org"
+      }
+   },
+   "verify":{
+      "type":"hosted",
+      "url":"http://badgetest.herokuapp.com/hashed.json?email=XXX%40gmail.com&override=%7B%22badge%22%3A%7B%22issuer%22%3A%7B%22origin%22%3A%22http%3A%2F%2Fbadgetest.herokuapp.com%22%7D%2C%22name%22%3A%22Badge%201427691567831-1%22%2C%22image%22%3A%22http%3A%2F%2Fvanillicon.com%2Fcbeb7a6a9fecb4b9eca6f389b6b1fdd9.png%22%7D%7D"
+   }
+}';
+
+if ($png->check_chunks("iTXt", "openbadges")) {
+        $png->write_chunks("iTXt", "openbadges", $assertion);
+    }
 
 $png->print_chunks('iTXt');
 
@@ -29,7 +53,7 @@ class PNG_MetaDataHandler
         if (!file_exists($file))
             throw new Exception('File does not exist');
 
-        if (!$this->_contents = file_get_contents($file)) 
+        if (!$this->_contents = file_get_contents($file))
             throw new Exception('Unable to open file');
 
         $png_signature = pack("C8", 137, 80, 78, 71, 13, 10, 26, 10);
@@ -76,7 +100,7 @@ class PNG_MetaDataHandler
                 }
             }
         }
-        return true; 
+        return true;
     }
 
     /**
@@ -102,7 +126,7 @@ class PNG_MetaDataHandler
             // Translated keyword:  0 or more bytes
             // Null separator:      1 byte
             // Text:                0 or more bytes
-            $data = $key . "\000'json'\0''\0\"{'method': 'hosted', 'assertionUrl': '" . $value . "'}\"";
+            $data = $key . "\x00\x00\x00\x00\x00" . $value;
         } else {
             // tEXt Textual data
             // Keyword:        1-79 bytes (character string)
